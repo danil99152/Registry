@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Registry</string>
+    <string name="process">Скан фото</string>
+    <string name="content_description">Editable bitmap</string>
+</resources>
