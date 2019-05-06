@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.otaliastudios.cameraview.CameraView
+        android:id="@+id/camera"
+        android:keepScreenOn="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cameraFacing="front"
+        app:cameraWhiteBalance="auto"
+        app:cameraHdr="off"
+        app:cameraAudio="off"
+        app:cameraAudioBitRate="0"
+        app:cameraVideoCodec="deviceDefault"
+        app:cameraVideoMaxSize="0"
+        app:cameraVideoMaxDuration="0"
+        app:cameraVideoBitRate="0"
+        app:cameraMode="picture"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"/>
