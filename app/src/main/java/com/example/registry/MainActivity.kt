@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var temporaryBitmap: Bitmap
     lateinit var canvas: Canvas
 
+    val camera = Camera2BasicFragment()
+
     val rectPaint = Paint()
     val faceDetector: FaceDetector
         get() = initializeDetector()
@@ -35,8 +37,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (null == savedInstanceState) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container, Camera2BasicFragment.newInstance())
+                .commit()
+        }
 
-        imageView = findViewById<View>(R.id.image_view) as ImageView
+      //  imageView = findViewById<View>(R.id.image_view) as ImageView
     }
 
     fun processImage(view: View) {
@@ -68,8 +75,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmap(bitmapOptions: BitmapFactory.Options) {
-        //TODO: изменить дефолтное изображение на фото камеры
-        defaultBitmap = BitmapFactory.decodeResource(resources, R.drawable.image, bitmapOptions)
+        //TODO: mFile - output camera File - проверить работает ли
+        defaultBitmap = BitmapFactory.decodeResource(resources, camera.mFile.toString().toInt(), bitmapOptions)
         temporaryBitmap = Bitmap.createBitmap(defaultBitmap.width,
             defaultBitmap.height,
             Bitmap.Config.RGB_565)

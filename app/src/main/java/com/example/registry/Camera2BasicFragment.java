@@ -216,7 +216,7 @@ public class Camera2BasicFragment extends Fragment
     /**
      * This is the output file for our picture.
      */
-    private File mFile;
+    protected File mFile;
 
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
