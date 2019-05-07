@@ -2,4 +2,17 @@
     <string name="app_name">Registry</string>
     <string name="process">Скан фото</string>
     <string name="content_description">Editable bitmap</string>
+    <string name="picture">Picture</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="intro_message">
+        <![CDATA[
+
+
+            This sample demonstrates the basic use of Camera2 API. Check the source code to see how
+            you can display camera preview and take pictures.
+
+
+        ]]>
+    </string>
 </resources>

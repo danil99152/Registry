@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeBitmap(bitmapOptions: BitmapFactory.Options) {
+        //TODO: изменить дефолтное изображение на фото камеры
         defaultBitmap = BitmapFactory.decodeResource(resources, R.drawable.image, bitmapOptions)
         temporaryBitmap = Bitmap.createBitmap(defaultBitmap.width,
             defaultBitmap.height,
