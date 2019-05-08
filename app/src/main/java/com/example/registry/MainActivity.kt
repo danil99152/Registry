@@ -1,38 +1,9 @@
 package com.example.registry
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.util.SparseArray
-import android.view.View
-import android.widget.ImageView
-import com.google.android.gms.vision.Frame
-import com.google.android.gms.vision.face.Face
-import com.google.android.gms.vision.face.FaceDetector
 
-private const val RADIUS = 10f
-private const val TEXT_SIZE = 50f
-private const val CORNER_RADIUS = 2f
-private const val STROKE_WIDTH = 5f
 class MainActivity : AppCompatActivity() {
-
-    lateinit var imageView: ImageView
-    lateinit var defaultBitmap: Bitmap
-    lateinit var temporaryBitmap: Bitmap
-    lateinit var canvas: Canvas
-
-    val camera = Camera2BasicFragment()
-
-    val rectPaint = Paint()
-    val faceDetector: FaceDetector
-        get() = initializeDetector()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,89 +16,4 @@ class MainActivity : AppCompatActivity() {
 
       //  imageView = findViewById<View>(R.id.image_view) as ImageView
     }
-
-    fun processImage(view: View) {
-        val bitmapOptions = BitmapFactory.Options().apply {
-            inMutable = true
-        }
-
-        initializeBitmap(bitmapOptions)
-        createRectanglePaint()
-
-        canvas = Canvas(temporaryBitmap).apply {
-            drawBitmap(defaultBitmap, 0f, 0f, null)
-        }
-
-        if (!faceDetector.isOperational) {
-            AlertDialog.Builder(this)
-                .setMessage("Face Detector could not be set up on your device :(")
-                .show()
-        } else {
-            val frame = Frame.Builder().setBitmap(defaultBitmap).build()
-            val sparseArray = faceDetector.detect(frame)
-
-            detectFaces(sparseArray)
-
-            imageView.setImageDrawable(BitmapDrawable(resources, temporaryBitmap))
-
-            faceDetector.release()
-        }
-    }
-
-    private fun initializeBitmap(bitmapOptions: BitmapFactory.Options) {
-        //TODO: mFile - output camera File - проверить работает ли
-        defaultBitmap = BitmapFactory.decodeResource(resources, camera.mFile.toString().toInt(), bitmapOptions)
-        temporaryBitmap = Bitmap.createBitmap(defaultBitmap.width,
-            defaultBitmap.height,
-            Bitmap.Config.RGB_565)
-    }
-
-    private fun createRectanglePaint() {
-        rectPaint.apply {
-            strokeWidth = STROKE_WIDTH
-            color = Color.CYAN
-            style = Paint.Style.STROKE
-        }
-    }
-
-    private fun initializeDetector(): FaceDetector {
-        return FaceDetector.Builder(this)
-            .setTrackingEnabled(false)
-            .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-            .build()
-    }
-
-    private fun detectFaces(sparseArray: SparseArray<Face>) {
-        for (i in 0 until sparseArray.size()) {
-            val face = sparseArray.valueAt(i)
-
-            val left = face.position.x
-            val top = face.position.y
-            val right = left + face.width
-            val bottom = top + face.height
-
-            val rectF = RectF(left, top, right, bottom)
-            canvas.drawRoundRect(rectF, CORNER_RADIUS, CORNER_RADIUS, rectPaint)
-
-            detectLandmarks(face)
-        }
-    }
-
-    private fun detectLandmarks(face: Face) {
-        for (landmark in face.landmarks) {
-            val xCoordinate = landmark.position.x
-            val yCoordinate = landmark.position.y
-
-            canvas.drawCircle(xCoordinate, yCoordinate, RADIUS, rectPaint)
-
-            drawLandmarkType(landmark.type, xCoordinate, yCoordinate)
-        }
-    }
-
-    private fun drawLandmarkType(landmarkType: Int, xCoordinate: Float, yCoordinate: Float) {
-        val type = landmarkType.toString()
-        rectPaint.textSize = TEXT_SIZE
-        canvas.drawText(type, xCoordinate, yCoordinate, rectPaint)
-    }
-
 }
