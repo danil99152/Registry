@@ -15,7 +15,7 @@ import android.widget.ImageView
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.face.Face
 import com.google.android.gms.vision.face.FaceDetector
-
+import java.io.File
 private const val RADIUS = 10f
 private const val TEXT_SIZE = 50f
 private const val CORNER_RADIUS = 2f
@@ -28,7 +28,7 @@ class FaceDetector : AppCompatActivity(){
     lateinit var temporaryBitmap: Bitmap
     lateinit var canvas: Canvas
 
-    val camera = Camera2BasicFragment()
+    val camera = Camera()
 
     val rectPaint = Paint()
     val faceDetector: FaceDetector
@@ -98,7 +98,13 @@ class FaceDetector : AppCompatActivity(){
             canvas.drawRoundRect(rectF, CORNER_RADIUS, CORNER_RADIUS, rectPaint)
 
             detectLandmarks(face)
+            generateHash(face)
         }
+    }
+
+    private fun generateHash(face: Face){
+        val hash = face.hashCode()
+        //TODO send it to remote server
     }
 
     private fun detectLandmarks(face: Face) {
