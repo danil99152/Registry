@@ -3,7 +3,7 @@ package com.example.registry.facedetection
 import android.app.Activity
 import android.content.Intent
 import android.graphics.*
-import android.media.FaceDetector
+import android.icu.math.BigDecimal
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
@@ -29,6 +29,7 @@ import com.otaliastudios.cameraview.FrameProcessor
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
+import kotlin.math.sqrt
 
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
@@ -206,89 +207,25 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                         face_detection_camera_image_view.setImageBitmap(bitmap)
                     }
 //////////////////////////////////////////////////////////////////////////////////////////////TODO
-
-                    val x0 = face.getContour(FirebaseVisionFaceContour.FACE).points[0].x.toDouble()
-                    val x1 = face.getContour(FirebaseVisionFaceContour.FACE).points[1].x.toDouble()
-                    val x2 = face.getContour(FirebaseVisionFaceContour.FACE).points[2].x.toDouble()
-                    val x3 = face.getContour(FirebaseVisionFaceContour.FACE).points[3].x.toDouble()
-                    val x4 = face.getContour(FirebaseVisionFaceContour.FACE).points[4].x.toDouble()
-                    val x5 = face.getContour(FirebaseVisionFaceContour.FACE).points[5].x.toDouble()
-                    val x6 = face.getContour(FirebaseVisionFaceContour.FACE).points[6].x.toDouble()
-                    val x7 = face.getContour(FirebaseVisionFaceContour.FACE).points[7].x.toDouble()
-                    val x8 = face.getContour(FirebaseVisionFaceContour.FACE).points[8].x.toDouble()
-                    val x9 = face.getContour(FirebaseVisionFaceContour.FACE).points[9].x.toDouble()
-                    val x10 = face.getContour(FirebaseVisionFaceContour.FACE).points[10].x.toDouble()
-                    val x11 = face.getContour(FirebaseVisionFaceContour.FACE).points[11].x.toDouble()
-                    val x12 = face.getContour(FirebaseVisionFaceContour.FACE).points[12].x.toDouble()
-                    val x13 = face.getContour(FirebaseVisionFaceContour.FACE).points[13].x.toDouble()
-                    val x14 = face.getContour(FirebaseVisionFaceContour.FACE).points[14].x.toDouble()
-                    val x15 = face.getContour(FirebaseVisionFaceContour.FACE).points[15].x.toDouble()
-                    val x16 = face.getContour(FirebaseVisionFaceContour.FACE).points[16].x.toDouble()
-                    val x17 = face.getContour(FirebaseVisionFaceContour.FACE).points[17].x.toDouble()
-                    val x18 = face.getContour(FirebaseVisionFaceContour.FACE).points[18].x.toDouble()
-                    val x19 = face.getContour(FirebaseVisionFaceContour.FACE).points[19].x.toDouble()
-                    val x20 = face.getContour(FirebaseVisionFaceContour.FACE).points[20].x.toDouble()
-                    val x21 = face.getContour(FirebaseVisionFaceContour.FACE).points[21].x.toDouble()
-                    val x22 = face.getContour(FirebaseVisionFaceContour.FACE).points[22].x.toDouble()
-                    val x23 = face.getContour(FirebaseVisionFaceContour.FACE).points[23].x.toDouble()
-                    val x24 = face.getContour(FirebaseVisionFaceContour.FACE).points[24].x.toDouble()
-                    val x25 = face.getContour(FirebaseVisionFaceContour.FACE).points[25].x.toDouble()
-                    val x26 = face.getContour(FirebaseVisionFaceContour.FACE).points[26].x.toDouble()
-                    val x27 = face.getContour(FirebaseVisionFaceContour.FACE).points[27].x.toDouble()
-                    val x28 = face.getContour(FirebaseVisionFaceContour.FACE).points[28].x.toDouble()
-                    val x29 = face.getContour(FirebaseVisionFaceContour.FACE).points[29].x.toDouble()
-                    val x30 = face.getContour(FirebaseVisionFaceContour.FACE).points[30].x.toDouble()
-                    val x31 = face.getContour(FirebaseVisionFaceContour.FACE).points[31].x.toDouble()
-                    val x32 = face.getContour(FirebaseVisionFaceContour.FACE).points[32].x.toDouble()
-                    val x33 = face.getContour(FirebaseVisionFaceContour.FACE).points[33].x.toDouble()
-                    val x34 = face.getContour(FirebaseVisionFaceContour.FACE).points[34].x.toDouble()
-                    val x35 = face.getContour(FirebaseVisionFaceContour.FACE).points[35].x.toDouble()
-
-              //      val x130 = face.getContour(FirebaseVisionFaceContour.ALL_POINTS).points[130].x
-
-                    val y0 = face.getContour(FirebaseVisionFaceContour.FACE).points[0].y.toDouble()
-                    val y1 = face.getContour(FirebaseVisionFaceContour.FACE).points[1].y.toDouble()
-                    val y2 = face.getContour(FirebaseVisionFaceContour.FACE).points[2].y.toDouble()
-                    val y3 = face.getContour(FirebaseVisionFaceContour.FACE).points[3].y.toDouble()
-                    val y4 = face.getContour(FirebaseVisionFaceContour.FACE).points[4].y.toDouble()
-                    val y5 = face.getContour(FirebaseVisionFaceContour.FACE).points[5].y.toDouble()
-                    val y6 = face.getContour(FirebaseVisionFaceContour.FACE).points[6].y.toDouble()
-                    val y7 = face.getContour(FirebaseVisionFaceContour.FACE).points[7].y.toDouble()
-                    val y8 = face.getContour(FirebaseVisionFaceContour.FACE).points[8].y.toDouble()
-                    val y9 = face.getContour(FirebaseVisionFaceContour.FACE).points[9].y.toDouble()
-                    val y10 = face.getContour(FirebaseVisionFaceContour.FACE).points[10].y.toDouble()
-                    val y11 = face.getContour(FirebaseVisionFaceContour.FACE).points[11].y.toDouble()
-                    val y12 = face.getContour(FirebaseVisionFaceContour.FACE).points[12].y.toDouble()
-                    val y13 = face.getContour(FirebaseVisionFaceContour.FACE).points[13].y.toDouble()
-                    val y14 = face.getContour(FirebaseVisionFaceContour.FACE).points[14].y.toDouble()
-                    val y15 = face.getContour(FirebaseVisionFaceContour.FACE).points[15].y.toDouble()
-                    val y16 = face.getContour(FirebaseVisionFaceContour.FACE).points[16].y.toDouble()
-                    val y17 = face.getContour(FirebaseVisionFaceContour.FACE).points[17].y.toDouble()
-                    val y18 = face.getContour(FirebaseVisionFaceContour.FACE).points[18].y.toDouble()
-                    val y19 = face.getContour(FirebaseVisionFaceContour.FACE).points[19].y.toDouble()
-                    val y20 = face.getContour(FirebaseVisionFaceContour.FACE).points[20].y.toDouble()
-                    val y21 = face.getContour(FirebaseVisionFaceContour.FACE).points[21].y.toDouble()
-                    val y22 = face.getContour(FirebaseVisionFaceContour.FACE).points[22].y.toDouble()
-                    val y23 = face.getContour(FirebaseVisionFaceContour.FACE).points[23].y.toDouble()
-                    val y24 = face.getContour(FirebaseVisionFaceContour.FACE).points[24].y.toDouble()
-                    val y25 = face.getContour(FirebaseVisionFaceContour.FACE).points[25].y.toDouble()
-                    val y26 = face.getContour(FirebaseVisionFaceContour.FACE).points[26].y.toDouble()
-                    val y27 = face.getContour(FirebaseVisionFaceContour.FACE).points[27].y.toDouble()
-                    val y28 = face.getContour(FirebaseVisionFaceContour.FACE).points[28].y.toDouble()
-                    val y29 = face.getContour(FirebaseVisionFaceContour.FACE).points[29].y.toDouble()
-                    val y30 = face.getContour(FirebaseVisionFaceContour.FACE).points[30].y.toDouble()
-                    val y31 = face.getContour(FirebaseVisionFaceContour.FACE).points[31].y.toDouble()
-                    val y32 = face.getContour(FirebaseVisionFaceContour.FACE).points[32].y.toDouble()
-                    val y33 = face.getContour(FirebaseVisionFaceContour.FACE).points[33].y.toDouble()
-                    val y34 = face.getContour(FirebaseVisionFaceContour.FACE).points[34].y.toDouble()
-                    val y35 = face.getContour(FirebaseVisionFaceContour.FACE).points[35].y.toDouble()
-
-               //     val y130 = face.getContour(FirebaseVisionFaceContour.ALL_POINTS).points[130].y
-
-                    val hash = ((x0/x1/x2/x3/x4/x5/x6/x7/x8/x9/x10/x11/x12/x13/x14/x15/x16/x17/x18/x19/x20/x21/x22/x23/x24/x25/x26/x27/x28/x29/x30/x31/x32/x33/x34/x35) + (y0/y1/y2/y3/y4/y5/y6/y7/y8/y9/y10/y11/y12/y13/y14/y15/y16/y17/y18/y19/y20/y21/y22/y23/y24/y25/y26/y27/y28/y29/y30/y31/y32/y33/y34/y35)).hashCode()
-
-                    Log.d("test", "hash: $hash")
-
+                    val list : MutableList<Double> = mutableListOf()
+                    for (i in 0 until 36) {
+                        val x1 = face.getContour(FirebaseVisionFaceContour.FACE).points[i].x
+                        val y1 = face.getContour(FirebaseVisionFaceContour.FACE).points[i].y
+                        for(j in 0 until 36){
+                            val x2 = face.getContour(FirebaseVisionFaceContour.FACE).points[j].x
+                            val y2 = face.getContour(FirebaseVisionFaceContour.FACE).points[j].y
+                            if (i != j) {
+                                val long = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)).toDouble()
+                                list.add(long)
+                            }
+                        }
+                    }
+                    var k = 1.0
+                    for ( i in list){
+                    k = (k / i) * 300
+                    }
+                    var hash = k.hashCode()
+                    Log.d("ID" , "$hash")
 //////////////////////////////////////////////////////////////////////////////////////////////
                 }
             }
