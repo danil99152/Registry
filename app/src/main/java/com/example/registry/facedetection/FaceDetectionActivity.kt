@@ -3,18 +3,19 @@ package com.example.registry.facedetection
 import android.app.Activity
 import android.content.Intent
 import android.graphics.*
-import android.icu.math.BigDecimal
 import android.os.Bundle
+import android.support.annotation.NonNull;
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import com.example.registry.NetworkService
+import com.example.registry.Post
 import com.example.registry.R
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -29,7 +30,9 @@ import com.otaliastudios.cameraview.FrameProcessor
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
-import kotlin.math.sqrt
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
@@ -64,6 +67,28 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
         bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
         bottomSheetRecyclerView.adapter = FaceDetectionAdapter(this, faceDetectionModels)
+
+        var view = findViewById<View>(R.id.face_detection_image_view)
+
+        NetworkService.getInstance()
+            .getJSONApi()
+            .getPostWithID(1)
+            .enqueue (Callback<Post>() {
+                override fun onResponse(@NonNull (Call<Post>) call, @NonNull (Response<Post>) response) {
+                    val post = response.body()
+
+                    view.append(post.getId() + "\n")
+                    view.append(post.getUserId() + "\n")
+                    view.append(post.getTitle() + "\n")
+                    view.append(post.getBody() + "\n")
+                }
+
+                override fun onFailure(@NonNull Call<Post> call, @NonNull Throwable t) {
+
+                    view.append("Error occurred while getting request!")
+                    t.printStackTrace()
+                }
+            })
     }
 
     override fun process(frame: Frame) {
@@ -206,27 +231,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                     } else {
                         face_detection_camera_image_view.setImageBitmap(bitmap)
                     }
-//////////////////////////////////////////////////////////////////////////////////////////////TODO
-                    val list : MutableList<Double> = mutableListOf()
-                    for (i in 0 until 36) {
-                        val x1 = face.getContour(FirebaseVisionFaceContour.FACE).points[i].x
-                        val y1 = face.getContour(FirebaseVisionFaceContour.FACE).points[i].y
-                        for(j in 0 until 36){
-                            val x2 = face.getContour(FirebaseVisionFaceContour.FACE).points[j].x
-                            val y2 = face.getContour(FirebaseVisionFaceContour.FACE).points[j].y
-                            if (i != j) {
-                                val long = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)).toDouble()
-                                list.add(long)
-                            }
-                        }
-                    }
-                    var k = 1.0
-                    for ( i in list){
-                    k = (k / i) * 300
-                    }
-                    var hash = k.hashCode()
-                    Log.d("ID" , "$hash")
-//////////////////////////////////////////////////////////////////////////////////////////////
                 }
             }
             .addOnFailureListener {
