@@ -3,20 +3,21 @@ package com.example.registry.facedetection
 import android.app.Activity
 import android.content.Intent
 import android.graphics.*
+import android.media.FaceDetector
+import android.net.Uri
 import android.os.Bundle
-import android.support.annotation.NonNull;
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
-import com.example.registry.NetworkService
-import com.example.registry.Post
 import com.example.registry.R
+import com.example.registry.Upload
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
@@ -30,9 +31,6 @@ import com.otaliastudios.cameraview.FrameProcessor
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
@@ -62,33 +60,12 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
         bottomSheetButton.setOnClickListener {
             //TODO bag - вылетает приложение при нажатии на кнопку фото
+            Log.d("Bag", "Кнопка нажата")
             CropImage.activity().start(this)
         }
 
         bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
         bottomSheetRecyclerView.adapter = FaceDetectionAdapter(this, faceDetectionModels)
-
-        var view = findViewById<View>(R.id.face_detection_image_view)
-
-        NetworkService.getInstance()
-            .getJSONApi()
-            .getPostWithID(1)
-            .enqueue (Callback<Post>() {
-                override fun onResponse(@NonNull (Call<Post>) call, @NonNull (Response<Post>) response) {
-                    val post = response.body()
-
-                    view.append(post.getId() + "\n")
-                    view.append(post.getUserId() + "\n")
-                    view.append(post.getTitle() + "\n")
-                    view.append(post.getBody() + "\n")
-                }
-
-                override fun onFailure(@NonNull Call<Post> call, @NonNull Throwable t) {
-
-                    view.append("Error occurred while getting request!")
-                    t.printStackTrace()
-                }
-            })
     }
 
     override fun process(frame: Frame) {
@@ -246,6 +223,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 val imageUri = result.uri
                 analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
                 face_detection_camera_container.visibility = View.GONE
+                Upload().uploadFile(imageUri)
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
             }
