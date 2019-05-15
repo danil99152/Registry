@@ -8,7 +8,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.registry"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -19,6 +19,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     aaptOptions {
         noCompress "tflite"  // Your model's file extension: "tflite", "lite", etc.
@@ -54,7 +58,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
-    implementation("com.squareup.okhttp3:okhttp:3.14.1")
+    implementation 'com.squareup.okhttp3:okhttp:3.14.1'
     implementation 'commons-io:commons-io:2.6'
 }
 apply plugin: 'com.google.gms.google-services'
