@@ -38,6 +38,7 @@
                 android:label="@string/face_detection"
                 android:parentActivityName=".MainActivity"
                 android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
     </application>
 
 </manifest>
