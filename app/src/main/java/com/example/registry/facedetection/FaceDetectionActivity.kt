@@ -59,10 +59,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         }
 
         bottomSheetButton.setOnClickListener {
-            //TODO bag - вылетает приложение при нажатии на кнопку фото
-            Log.d("Bag", "Кнопка нажата")
             CropImage.activity().start(this)
-            Log.d("Bag", "баг не тут")
         }
 
         bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
