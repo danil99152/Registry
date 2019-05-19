@@ -1,11 +1,12 @@
 package com.example.registry.facedetection
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.*
-import android.media.FaceDetector
-import android.net.Uri
+import android.media.MediaScannerConnection
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
@@ -31,7 +32,12 @@ import com.otaliastudios.cameraview.FrameProcessor
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
+import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
+@Suppress("DEPRECATION")
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
     private var cameraFacing: Facing = Facing.FRONT
@@ -59,11 +65,53 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         }
 
         bottomSheetButton.setOnClickListener {
-            CropImage.activity().start(this)
+            val v1 = imageView.rootView
+            v1.isDrawingCacheEnabled = true
+            val bm = v1.drawingCache
+            storeImage(bm)
         }
 
         bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
         bottomSheetRecyclerView.adapter = FaceDetectionAdapter(this, faceDetectionModels)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun storeImage(imageData: Bitmap): Boolean {
+        // get path to external storage (SD card)
+        val iconsStoragePath = Environment.getExternalStorageDirectory().toString() + "/FaceDetected/"
+        val sdIconStorageDir = File(iconsStoragePath)
+        // create storage directories, if they don't exist
+        sdIconStorageDir.mkdirs()
+        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss")
+        val currentDateandTime = sdf.format(Date())
+        val filename = "Face$currentDateandTime.png"
+        try {
+            val file = File(
+                sdIconStorageDir.toString() + File.separator
+                        + filename
+            )
+            val fileUri = file.toURI()
+            Upload().uploadFile(fileUri)
+            val fileOutputStream = FileOutputStream(file)
+            val bos = BufferedOutputStream(
+                fileOutputStream
+            )
+            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
+            bos.flush()
+            bos.close()
+            MediaScannerConnection.scanFile(
+                this,
+                arrayOf(file.path),
+                arrayOf("image/jpeg"), null
+            )
+        } catch (e: FileNotFoundException) {
+            Log.w("TAG", "Error saving image file: " + e.message)
+            return false
+        } catch (e: IOException) {
+            Log.w("TAG", "Error saving image file: " + e.message)
+            return false
+        }
+        return true
     }
 
     override fun process(frame: Frame) {
@@ -221,7 +269,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 val imageUri = result.uri
                 analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
                 face_detection_camera_container.visibility = View.GONE
-                Upload().uploadFile(imageUri)
+              //  Upload().uploadFile(imageUri)
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
             }

@@ -11,10 +11,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import org.apache.commons.io.FileUtils;
 import java.io.File;
+import java.net.URI;
 
 public class Upload {
 
-    public void uploadFile(Uri fileUri) {
+    public void uploadFile(URI fileUri) {
         // create upload service client
         FileUploadService service =
                 ServiceGenerator.createService(FileUploadService.class);
