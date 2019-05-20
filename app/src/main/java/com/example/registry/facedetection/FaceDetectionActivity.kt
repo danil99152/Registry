@@ -12,10 +12,12 @@ import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Layout
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import com.example.registry.R
 import com.example.registry.Upload
@@ -26,6 +28,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
+import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
 import com.otaliastudios.cameraview.Frame
 import com.otaliastudios.cameraview.FrameProcessor
@@ -37,10 +40,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
     private var cameraFacing: Facing = Facing.FRONT
+
+    private val camera by lazy { findViewById<CameraView>(R.id.face_detection_camera_view)!! }
 
     private val imageView by lazy { findViewById<ImageView>(R.id.face_detection_image_view)!! }
 
@@ -65,7 +70,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         }
 
         bottomSheetButton.setOnClickListener {
-            val v1 = imageView.rootView
+            val v1 = camera.rootView
             v1.isDrawingCacheEnabled = true
             val bm = v1.drawingCache
             storeImage(bm)
@@ -78,20 +83,17 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
     @SuppressLint("SimpleDateFormat")
     private fun storeImage(imageData: Bitmap): Boolean {
         // get path to external storage (SD card)
-        val iconsStoragePath = Environment.getExternalStorageDirectory().toString() + "/FaceDetected/"
-        val sdIconStorageDir = File(iconsStoragePath)
+        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
         // create storage directories, if they don't exist
-        sdIconStorageDir.mkdirs()
-        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss")
-        val currentDateandTime = sdf.format(Date())
-        val filename = "Face$currentDateandTime.png"
+        storageDir.mkdirs()
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val filename = "FaceBy$timeStamp"
         try {
-            val file = File(
-                sdIconStorageDir.toString() + File.separator
-                        + filename
+            val file = File.createTempFile(
+                filename, /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
             )
-            val fileUri = file.toURI()
-            Upload().uploadFile(fileUri)
             val fileOutputStream = FileOutputStream(file)
             val bos = BufferedOutputStream(
                 fileOutputStream
@@ -104,6 +106,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 arrayOf(file.path),
                 arrayOf("image/jpeg"), null
             )
+            Toast.makeText(this, "фото сделано и сохранено", Toast.LENGTH_SHORT).show()
         } catch (e: FileNotFoundException) {
             Log.w("TAG", "Error saving image file: " + e.message)
             return false
@@ -113,6 +116,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         }
         return true
     }
+
 
     override fun process(frame: Frame) {
 
