@@ -82,37 +82,41 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
     @SuppressLint("SimpleDateFormat")
     private fun storeImage(imageData: Bitmap): Boolean {
-        // get path to external storage (SD card)
-        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
-        // create storage directories, if they don't exist
-        storageDir.mkdirs()
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val filename = "FaceBy$timeStamp"
-        try {
-            val file = File.createTempFile(
-                filename, /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
-            )
-            val fileOutputStream = FileOutputStream(file)
-            val bos = BufferedOutputStream(
-                fileOutputStream
-            )
-            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
-            bos.flush()
-            bos.close()
-            MediaScannerConnection.scanFile(
-                this,
-                arrayOf(file.path),
-                arrayOf("image/jpeg"), null
-            )
-            Toast.makeText(this, "фото сделано и сохранено", Toast.LENGTH_SHORT).show()
-        } catch (e: FileNotFoundException) {
-            Log.w("TAG", "Error saving image file: " + e.message)
-            return false
-        } catch (e: IOException) {
-            Log.w("TAG", "Error saving image file: " + e.message)
-            return false
+        val existsFace = analyzeImage(imageData)
+        if (existsFace) {
+            // get path to external storage (SD card)
+            val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
+            // create storage directories, if they don't exist
+            storageDir.mkdirs()
+            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            val filename = "FaceBy$timeStamp"
+            try {
+                val file = File.createTempFile(
+                    filename, /* prefix */
+                    ".jpg", /* suffix */
+                    storageDir /* directory */
+                )
+                val fileOutputStream = FileOutputStream(file)
+                val bos = BufferedOutputStream(
+                    fileOutputStream
+                )
+                imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
+                bos.flush()
+                bos.close()
+                MediaScannerConnection.scanFile(
+                    this,
+                    arrayOf(file.path),
+                    arrayOf("image/jpeg"), null
+                )
+                Toast.makeText(this, "фото сделано и сохранено", Toast.LENGTH_SHORT).show()
+            } catch (e: FileNotFoundException) {
+                Log.w("TAG", "Error saving image file: " + e.message)
+                return false
+            } catch (e: IOException) {
+                Log.w("TAG", "Error saving image file: " + e.message)
+                return false
+            }
+            return true
         }
         return true
     }
@@ -280,10 +284,10 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         }
     }
 
-    private fun analyzeImage(image: Bitmap?) {
+    private fun analyzeImage(image: Bitmap?): Boolean {
         if (image == null) {
             Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
-            return
+            return false
         }
 
         imageView.setImageBitmap(null)
@@ -314,6 +318,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
                 hideProgress()
             }
+        return true
     }
 
     private fun detectFaces(faces: List<FirebaseVisionFace>?, image: Bitmap?) {
