@@ -1,23 +1,18 @@
 package com.example.registry.facedetection
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Intent
 import android.graphics.*
 import android.media.MediaScannerConnection
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Layout
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import com.example.registry.R
 import com.example.registry.Upload
@@ -32,7 +27,6 @@ import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.Facing
 import com.otaliastudios.cameraview.Frame
 import com.otaliastudios.cameraview.FrameProcessor
-import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
 import java.io.*
@@ -96,6 +90,8 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                     ".jpg", /* suffix */
                     storageDir /* directory */
                 )
+                val fileURI = file.toURI()
+                Upload().uploadFile(fileURI)
                 val fileOutputStream = FileOutputStream(file)
                 val bos = BufferedOutputStream(
                     fileOutputStream
@@ -108,7 +104,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                     arrayOf(file.path),
                     arrayOf("image/jpeg"), null
                 )
-                Toast.makeText(this, "фото сделано и сохранено", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Вы авторизовались", Toast.LENGTH_SHORT).show()
             } catch (e: FileNotFoundException) {
                 Log.w("TAG", "Error saving image file: " + e.message)
                 return false
@@ -117,10 +113,11 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 return false
             }
             return true
+        } else {
+            Toast.makeText(this, "Не видно вашего лица", Toast.LENGTH_SHORT).show()
+            return false
         }
-        return true
     }
-
 
     override fun process(frame: Frame) {
 
@@ -269,27 +266,27 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             }
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-
-            if (resultCode == Activity.RESULT_OK) {
-                val imageUri = result.uri
-                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
-                face_detection_camera_container.visibility = View.GONE
-              //  Upload().uploadFile(imageUri)
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+//    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//            val result = CropImage.getActivityResult(data)
+//
+//            if (resultCode == Activity.RESULT_OK) {
+//                val imageUri = result.uri
+//                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
+//                face_detection_camera_container.visibility = View.GONE
+//              //  Upload().uploadFile(imageUri)
+//            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+//                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
     private fun analyzeImage(image: Bitmap?): Boolean {
         if (image == null) {
             Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
             return false
         }
-
+        var case = false
         imageView.setImageBitmap(null)
         faceDetectionModels.clear()
         bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
@@ -313,12 +310,14 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 hideProgress()
                 bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                case = true
             }
             .addOnFailureListener {
                 Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
                 hideProgress()
+                case = false
             }
-        return true
+        return case
     }
 
     private fun detectFaces(faces: List<FirebaseVisionFace>?, image: Bitmap?) {
