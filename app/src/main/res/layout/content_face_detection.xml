@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <com.otaliastudios.cameraview.CameraView
-            android:id="@+id/face_detection_camera_view"
+            android:id="@+id/cameraView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
