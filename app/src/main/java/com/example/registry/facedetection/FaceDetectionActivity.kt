@@ -294,7 +294,8 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
                 detectFaces(it, mutableImage)
 
-                imageView.setImageBitmap(mutableImage)
+                // показывает результат фото (людям лучше не видеть себя)
+                // imageView.setImageBitmap(mutableImage)
                 hideProgress()
                 bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED

@@ -29,7 +29,7 @@ class Upload {
         // add another part within the multipart request
         val descriptionString = "123"
         val description = RequestBody.create(
-            okhttp3.MultipartBody.FORM, descriptionString
+            MultipartBody.FORM, descriptionString
         )
 
         // finally, execute the request
