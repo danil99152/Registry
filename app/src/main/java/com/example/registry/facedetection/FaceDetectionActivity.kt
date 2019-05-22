@@ -9,25 +9,20 @@ import android.media.MediaScannerConnection
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.registry.R
 import com.example.registry.Upload
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
-import com.otaliastudios.cameraview.CameraListener
-import com.otaliastudios.cameraview.Facing
-import com.otaliastudios.cameraview.Frame
-import com.otaliastudios.cameraview.FrameProcessor
+import com.otaliastudios.cameraview.*
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
@@ -44,7 +39,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
     private val imageView by lazy { findViewById<ImageView>(R.id.face_detection_image_view)!! }
 
     private val bottomSheetButton by lazy { findViewById<FrameLayout>(R.id.bottom_sheet_button)!! }
-    private val bottomSheetRecyclerView by lazy { findViewById<RecyclerView>(R.id.bottom_sheet_recycler_view)!! }
+    private val bottomSheetRecyclerView by lazy { findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.bottom_sheet_recycler_view)!! }
     private val bottomSheetBehavior by lazy { BottomSheetBehavior.from(findViewById(R.id.bottom_sheet)!!) }
 
     private val faceDetectionModels = ArrayList<FaceDetectionModel>()
@@ -55,6 +50,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        cameraView.sessionType = SessionType.PICTURE
         cameraView.facing = cameraFacing
         cameraView.setLifecycleOwner(this)
         cameraView.addFrameProcessor(this)
@@ -73,7 +69,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             cameraView.capturePicture()
         }
 
-        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
+        bottomSheetRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         bottomSheetRecyclerView.adapter = FaceDetectionAdapter(this, faceDetectionModels)
     }
 
