@@ -3,7 +3,7 @@ package com.example.registry
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.registry.facedetection.FaceDetectionActivity
 
-class MainActivityAdapter(private val context: Context) : RecyclerView.Adapter<MainActivityAdapter.MainActivityViewHolder>() {
+class MainActivityAdapter(private val context: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<MainActivityAdapter.MainActivityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivityViewHolder {
         return MainActivityViewHolder(LayoutInflater.from(context).inflate(R.layout.item_main_activity, parent, false))
@@ -34,7 +34,7 @@ class MainActivityAdapter(private val context: Context) : RecyclerView.Adapter<M
 
     override fun getItemCount() = 1
 
-    class MainActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class MainActivityViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val view = itemView
         val image = itemView.findViewById<ImageView>(R.id.item_main_activity_image_view)!!
         val heading = itemView.findViewById<TextView>(R.id.item_main_activity_heading_text_view)!!

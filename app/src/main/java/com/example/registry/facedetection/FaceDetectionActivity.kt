@@ -1,19 +1,19 @@
 package com.example.registry.facedetection
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.graphics.*
 import android.media.MediaScannerConnection
 import android.os.Bundle
 import android.os.Environment
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.registry.R
 import com.example.registry.Upload
 import com.google.firebase.ml.vision.FirebaseVision
@@ -23,10 +23,8 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
-import com.otaliastudios.cameraview.CameraView
-import com.otaliastudios.cameraview.Facing
-import com.otaliastudios.cameraview.Frame
-import com.otaliastudios.cameraview.FrameProcessor
+import com.otaliastudios.cameraview.*
+import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
 import java.io.*
@@ -38,14 +36,10 @@ import kotlin.collections.ArrayList
 class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 
     private var cameraFacing: Facing = Facing.FRONT
-
-    private val camera by lazy { findViewById<CameraView>(R.id.face_detection_camera_view)!! }
-
     private val imageView by lazy { findViewById<ImageView>(R.id.face_detection_image_view)!! }
 
     private val bottomSheetButton by lazy { findViewById<FrameLayout>(R.id.bottom_sheet_button)!! }
-    private val bottomSheetRecyclerView by lazy { findViewById<RecyclerView>(R.id.bottom_sheet_recycler_view)!! }
-    private val bottomSheetBehavior by lazy { BottomSheetBehavior.from(findViewById(R.id.bottom_sheet)!!) }
+    private val bottomSheetRecyclerView by lazy { findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.bottom_sheet_recycler_view)!! }
 
     private val faceDetectionModels = ArrayList<FaceDetectionModel>()
 
@@ -54,69 +48,63 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         setContentView(R.layout.activity_face_detection)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        face_detection_camera_view.facing = cameraFacing
-        face_detection_camera_view.setLifecycleOwner(this)
-        face_detection_camera_view.addFrameProcessor(this)
+        cameraView.sessionType = SessionType.PICTURE
+        cameraView.facing = cameraFacing
+        cameraView.setLifecycleOwner(this)
+        cameraView.addCameraListener(object: CameraListener() {
+            override fun onPictureTaken(jpeg: ByteArray?) {
+                analyzeImage(BitmapFactory.decodeByteArray(jpeg, 0, jpeg?.size ?: 0))
+            }
+        })
+        cameraView.addFrameProcessor(this)
         face_detection_camera_toggle_button.setOnClickListener {
             cameraFacing = if (cameraFacing == Facing.FRONT) Facing.BACK else Facing.FRONT
-            face_detection_camera_view.facing = cameraFacing
+            cameraView.facing = cameraFacing
         }
 
         bottomSheetButton.setOnClickListener {
-            val v1 = camera.rootView
-            v1.isDrawingCacheEnabled = true
-            val bm = v1.drawingCache
-            storeImage(bm)
+            cameraView.capturePicture()
         }
 
-        bottomSheetRecyclerView.layoutManager = LinearLayoutManager(this)
+        bottomSheetRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         bottomSheetRecyclerView.adapter = FaceDetectionAdapter(this, faceDetectionModels)
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun storeImage(imageData: Bitmap): Boolean {
-        val existsFace = analyzeImage(imageData)
-        if (existsFace) {
-            // get path to external storage (SD card)
-            val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
-            // create storage directories, if they don't exist
-            storageDir.mkdirs()
-            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            val filename = "FaceBy$timeStamp"
-            try {
-                val file = File.createTempFile(
-                    filename, /* prefix */
-                    ".jpg", /* suffix */
-                    storageDir /* directory */
-                )
-                val fileURI = file.toURI()
-                Upload().uploadFile(fileURI)
-                val fileOutputStream = FileOutputStream(file)
-                val bos = BufferedOutputStream(
-                    fileOutputStream
-                )
-                imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
-                bos.flush()
-                bos.close()
-                MediaScannerConnection.scanFile(
-                    this,
-                    arrayOf(file.path),
-                    arrayOf("image/jpeg"), null
-                )
-                Toast.makeText(this, "Вы авторизовались", Toast.LENGTH_SHORT).show()
-            } catch (e: FileNotFoundException) {
-                Log.w("TAG", "Error saving image file: " + e.message)
-                return false
-            } catch (e: IOException) {
-                Log.w("TAG", "Error saving image file: " + e.message)
-                return false
-            }
-            return true
-        } else {
-            Toast.makeText(this, "Не видно вашего лица", Toast.LENGTH_SHORT).show()
-            return false
+    private fun storeImage(imageData: Bitmap) {
+        // get path to external storage (SD card)
+        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
+        // create storage directories, if they don't exist
+        storageDir.mkdirs()
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val filename = "FaceBy$timeStamp"
+        try {
+            val file = File.createTempFile(
+                filename, /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+            )
+            val fileURI = file.toURI()
+            val fileOutputStream = FileOutputStream(file)
+            val bos = BufferedOutputStream(
+                fileOutputStream
+            )
+            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
+            bos.flush()
+            bos.close()
+            MediaScannerConnection.scanFile(
+                this,
+                arrayOf(file.path),
+                arrayOf("image/jpeg"), null
+            )
+            Upload().uploadFile(fileURI)
+            Toast.makeText(this, "Вы авторизовались", Toast.LENGTH_SHORT).show()
+        } catch (e: FileNotFoundException) {
+            Log.w("TAG", "Error saving image file: " + e.message)
+        } catch (e: IOException) {
+            Log.w("TAG", "Error saving image file: " + e.message)
         }
+        return
     }
 
     override fun process(frame: Frame) {
@@ -266,116 +254,143 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             }
     }
 
-//    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-//            val result = CropImage.getActivityResult(data)
-//
-//            if (resultCode == Activity.RESULT_OK) {
-//                val imageUri = result.uri
-//                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
-//                face_detection_camera_container.visibility = View.GONE
-//              //  Upload().uploadFile(imageUri)
-//            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-//                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
 
-    private fun analyzeImage(image: Bitmap?): Boolean {
+            if (resultCode == Activity.RESULT_OK) {
+                val imageUri = result.uri
+                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
+                face_detection_camera_container.visibility = View.GONE
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun analyzeImage(image: Bitmap?) {
         if (image == null) {
             Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
-            return false
+            return
+        } else {
+            imageView.setImageBitmap(null)
+            faceDetectionModels.clear()
+            bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
+            showProgress()
+
+            val firebaseVisionImage = FirebaseVisionImage.fromBitmap(image)
+            val options = FirebaseVisionFaceDetectorOptions.Builder()
+                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .build()
+            val faceDetector = FirebaseVision.getInstance().getVisionFaceDetector(options)
+            faceDetector.detectInImage(firebaseVisionImage)
+                .addOnSuccessListener {
+                    val mutableImage = image.copy(Bitmap.Config.ARGB_8888, true)
+
+                    detectFaces(it, mutableImage)
+
+                    imageView.setImageBitmap(mutableImage)
+                    hideProgress()
+                    bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
+                    hideProgress()
+                }
+            return
         }
-        var case = false
-        imageView.setImageBitmap(null)
-        faceDetectionModels.clear()
-        bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        showProgress()
-
-        val firebaseVisionImage = FirebaseVisionImage.fromBitmap(image)
-        val options = FirebaseVisionFaceDetectorOptions.Builder()
-            .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-            .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
-            .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
-            .build()
-        val faceDetector = FirebaseVision.getInstance().getVisionFaceDetector(options)
-        faceDetector.detectInImage(firebaseVisionImage)
-            .addOnSuccessListener {
-                val mutableImage = image.copy(Bitmap.Config.ARGB_8888, true)
-
-                detectFaces(it, mutableImage)
-
-                imageView.setImageBitmap(mutableImage)
-                hideProgress()
-                bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                case = true
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
-                hideProgress()
-                case = false
-            }
-        return case
     }
 
     private fun detectFaces(faces: List<FirebaseVisionFace>?, image: Bitmap?) {
         if (faces == null || image == null) {
-            Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Вашего лица не видно", Toast.LENGTH_SHORT).show()
             return
-        }
+        } else {
+            storeImage(image)
+            val canvas = Canvas(image)
+            val facePaint = Paint()
+            facePaint.color = Color.RED
+            facePaint.style = Paint.Style.STROKE
+            facePaint.strokeWidth = 8F
+            val faceTextPaint = Paint()
+            faceTextPaint.color = Color.RED
+            faceTextPaint.textSize = 40F
+            faceTextPaint.typeface = Typeface.DEFAULT_BOLD
+            val landmarkPaint = Paint()
+            landmarkPaint.color = Color.RED
+            landmarkPaint.style = Paint.Style.FILL
+            landmarkPaint.strokeWidth = 8F
 
-        val canvas = Canvas(image)
-        val facePaint = Paint()
-        facePaint.color = Color.RED
-        facePaint.style = Paint.Style.STROKE
-        facePaint.strokeWidth = 8F
-        val faceTextPaint = Paint()
-        faceTextPaint.color = Color.RED
-        faceTextPaint.textSize = 40F
-        faceTextPaint.typeface = Typeface.DEFAULT_BOLD
-        val landmarkPaint = Paint()
-        landmarkPaint.color = Color.RED
-        landmarkPaint.style = Paint.Style.FILL
-        landmarkPaint.strokeWidth = 8F
+            for ((index, face) in faces.withIndex()) {
 
-        for ((index, face) in faces.withIndex()) {
+                canvas.drawRect(face.boundingBox, facePaint)
+                canvas.drawText(
+                    "Face$index",
+                    (face.boundingBox.centerX() - face.boundingBox.width() / 2) + 8F,
+                    (face.boundingBox.centerY() + face.boundingBox.height() / 2) - 8F,
+                    faceTextPaint
+                )
 
-            canvas.drawRect(face.boundingBox, facePaint)
-            canvas.drawText("Face$index", (face.boundingBox.centerX() - face.boundingBox.width() / 2) + 8F, (face.boundingBox.centerY() + face.boundingBox.height() / 2) - 8F, faceTextPaint)
+                if (face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE) != null) {
+                    val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)!!
+                    canvas.drawCircle(leftEye.position.x, leftEye.position.y, 8F, landmarkPaint)
+                }
+                if (face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE) != null) {
+                    val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)!!
+                    canvas.drawCircle(rightEye.position.x, rightEye.position.y, 8F, landmarkPaint)
+                }
+                if (face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE) != null) {
+                    val nose = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)!!
+                    canvas.drawCircle(nose.position.x, nose.position.y, 8F, landmarkPaint)
+                }
+                if (face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR) != null) {
+                    val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)!!
+                    canvas.drawCircle(leftEar.position.x, leftEar.position.y, 8F, landmarkPaint)
+                }
+                if (face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR) != null) {
+                    val rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR)!!
+                    canvas.drawCircle(rightEar.position.x, rightEar.position.y, 8F, landmarkPaint)
+                }
+                if (face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT) != null && face.getLandmark(
+                        FirebaseVisionFaceLandmark.MOUTH_BOTTOM
+                    ) != null && face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT) != null
+                ) {
+                    val leftMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT)!!
+                    val bottomMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM)!!
+                    val rightMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT)!!
+                    canvas.drawLine(
+                        leftMouth.position.x,
+                        leftMouth.position.y,
+                        bottomMouth.position.x,
+                        bottomMouth.position.y,
+                        landmarkPaint
+                    )
+                    canvas.drawLine(
+                        bottomMouth.position.x,
+                        bottomMouth.position.y,
+                        rightMouth.position.x,
+                        rightMouth.position.y,
+                        landmarkPaint
+                    )
+                }
 
-            if (face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE) != null) {
-                val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)!!
-                canvas.drawCircle(leftEye.position.x, leftEye.position.y, 8F, landmarkPaint)
+                faceDetectionModels.add(FaceDetectionModel(index, "Smiling Probability  ${face.smilingProbability}"))
+                faceDetectionModels.add(
+                    FaceDetectionModel(
+                        index,
+                        "Left Eye Open Probability  ${face.leftEyeOpenProbability}"
+                    )
+                )
+                faceDetectionModels.add(
+                    FaceDetectionModel(
+                        index,
+                        "Right Eye Open Probability  ${face.rightEyeOpenProbability}"
+                    )
+                )
             }
-            if (face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE) != null) {
-                val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)!!
-                canvas.drawCircle(rightEye.position.x, rightEye.position.y, 8F, landmarkPaint)
-            }
-            if (face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE) != null) {
-                val nose = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)!!
-                canvas.drawCircle(nose.position.x, nose.position.y, 8F, landmarkPaint)
-            }
-            if (face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR) != null) {
-                val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)!!
-                canvas.drawCircle(leftEar.position.x, leftEar.position.y, 8F, landmarkPaint)
-            }
-            if (face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR) != null) {
-                val rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR)!!
-                canvas.drawCircle(rightEar.position.x, rightEar.position.y, 8F, landmarkPaint)
-            }
-            if (face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT) != null && face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM) != null && face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT) != null) {
-                val leftMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT)!!
-                val bottomMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM)!!
-                val rightMouth = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT)!!
-                canvas.drawLine(leftMouth.position.x, leftMouth.position.y, bottomMouth.position.x, bottomMouth.position.y, landmarkPaint)
-                canvas.drawLine(bottomMouth.position.x, bottomMouth.position.y, rightMouth.position.x, rightMouth.position.y, landmarkPaint)
-            }
-
-            faceDetectionModels.add(FaceDetectionModel(index, "Smiling Probability  ${face.smilingProbability}"))
-            faceDetectionModels.add(FaceDetectionModel(index, "Left Eye Open Probability  ${face.leftEyeOpenProbability}"))
-            faceDetectionModels.add(FaceDetectionModel(index, "Right Eye Open Probability  ${face.rightEyeOpenProbability}"))
+            return
         }
     }
 
@@ -388,5 +403,4 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.VISIBLE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.GONE
     }
-
 }
