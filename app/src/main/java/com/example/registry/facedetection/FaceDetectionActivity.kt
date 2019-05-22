@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -87,10 +88,10 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 ".jpg", /* suffix */
                 storageDir /* directory */
             )
-            val fileURI = file.toURI()
+            val fileURI = Uri.fromFile(file)
             val fileOutputStream = FileOutputStream(file)
             val bos = BufferedOutputStream(fileOutputStream)
-            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos)
+            imageData.compress(Bitmap.CompressFormat.JPEG, 100, bos)
             bos.flush()
             bos.close()
             MediaScannerConnection.scanFile(

@@ -1,5 +1,6 @@
 package com.example.registry
 
+import android.net.Uri
 import android.util.Log
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -9,11 +10,10 @@ import org.apache.commons.io.FileUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.net.URI
 
 class Upload {
 
-    fun uploadFile(fileUri: URI) {
+    fun uploadFile(fileUri: Uri) {
         // create upload service client
         val service = ServiceGenerator.createService(FileUploadService::class.java)
 
