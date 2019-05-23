@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Registry</string>
-    <string name="process">Скан фото</string>
-    <string name="content_description">Editable bitmap</string>
+    <string name="about">Виртуальная регистратура</string>
+    <string name="face_detection">Аутентификация по лицу</string>
+    <string name="btnUploadToServer">Upload to Server</string>
 </resources>
