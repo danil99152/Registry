@@ -18,7 +18,7 @@ class Upload {
         val service = ServiceGenerator.createService(FileUploadService::class.java)
 
         // use the FileUtils to get the actual file by uri
-        val file = FileUtils.getFile(this.toString(), fileUri.toString())
+        val  file = FileUtils.getFile(fileUri.path)
 
         // create RequestBody instance from file
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
