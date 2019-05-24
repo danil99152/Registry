@@ -3,7 +3,8 @@ package com.example.registry.facedetection
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
@@ -22,10 +23,8 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.otaliastudios.cameraview.*
-import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_face_detection.*
 import kotlinx.android.synthetic.main.content_face_detection.*
 import java.io.*
@@ -386,19 +385,19 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-
-            if (resultCode == Activity.RESULT_OK) {
-                val imageUri = result.uri
-                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
-                face_detection_camera_container.visibility = View.GONE
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+//            val result = CropImage.getActivityResult(data)
+//
+//            if (resultCode == Activity.RESULT_OK) {
+//                val imageUri = result.uri
+//                analyzeImage(MediaStore.Images.Media.getBitmap(contentResolver, imageUri))
+//                face_detection_camera_container.visibility = View.GONE
+//            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+//                Toast.makeText(this, "There was some error : ${result.error.message}", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
     private fun analyzeImage(image: Bitmap?) {
         if (image == null) {
