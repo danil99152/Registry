@@ -132,9 +132,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                 when {
                     it.size == 1 -> Toast.makeText(this, "Добрый день", Toast.LENGTH_LONG).show()
                     it.size > 1 -> Toast.makeText(this, "Уберите чужие лица из камеры", Toast.LENGTH_LONG).show()
-                    it.size == 0 -> Toast.makeText(this, null, Toast.LENGTH_LONG).cancel()
-                    //val t = it.size
-                    //Log.d("кол-во лиц:", "$t")
                 }
 
                 //                val bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888)
