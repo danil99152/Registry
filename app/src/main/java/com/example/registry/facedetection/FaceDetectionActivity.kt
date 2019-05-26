@@ -1,8 +1,7 @@
 package com.example.registry.facedetection
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
@@ -20,9 +19,11 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.otaliastudios.cameraview.*
 import kotlinx.android.synthetic.main.activity_face_detection.*
+import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.content_face_detection.*
 import java.io.*
 import java.text.SimpleDateFormat
@@ -107,7 +108,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         return
     }
 
-    @SuppressLint("ShowToast")
     override fun process(frame: Frame) {
 
         val width = frame.size.width
@@ -129,255 +129,78 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             .addOnSuccessListener {
                 face_detection_camera_image_view.setImageBitmap(null)
 
-                when {
-                    it.size == 1 -> Toast.makeText(this, "Добрый день", Toast.LENGTH_LONG).show()
-                    it.size > 1 -> Toast.makeText(this, "Уберите чужие лица из камеры", Toast.LENGTH_LONG).show()
-                }
-
-                //                val bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888)
-                //                val canvas = Canvas(bitmap)
-                //                val dotPaint = Paint()
-                //                dotPaint.color = Color.RED
-                //                dotPaint.style = Paint.Style.FILL
-                //                dotPaint.strokeWidth = 4F
-                //                val linePaint = Paint()
-                //                linePaint.color = Color.GREEN
-                //                linePaint.style = Paint.Style.STROKE
-                //                linePaint.strokeWidth = 2F
-                //                for (face in it) {
-                //
-                //                    val faceContours = face.getContour(FirebaseVisionFaceContour.FACE).points
-                //                    for ((i, contour) in faceContours.withIndex()) {
-                //                        if (i != faceContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, faceContours[i + 1].x, faceContours[i + 1].y, linePaint)
-                //                        else
-                //                            canvas.drawLine(contour.x, contour.y, faceContours[0].x, faceContours[0].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val leftEyebrowTopContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYEBROW_TOP).points
-                //                    for ((i, contour) in leftEyebrowTopContours.withIndex()) {
-                //                        if (i != leftEyebrowTopContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, leftEyebrowTopContours[i + 1].x, leftEyebrowTopContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val leftEyebrowBottomContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYEBROW_BOTTOM).points
-                //                    for ((i, contour) in leftEyebrowBottomContours.withIndex()) {
-                //                        if (i != leftEyebrowBottomContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, leftEyebrowBottomContours[i + 1].x, leftEyebrowBottomContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val rightEyebrowTopContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYEBROW_TOP).points
-                //                    for ((i, contour) in rightEyebrowTopContours.withIndex()) {
-                //                        if (i != rightEyebrowTopContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, rightEyebrowTopContours[i + 1].x, rightEyebrowTopContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val rightEyebrowBottomContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYEBROW_BOTTOM).points
-                //                    for ((i, contour) in rightEyebrowBottomContours.withIndex()) {
-                //                        if (i != rightEyebrowBottomContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, rightEyebrowBottomContours[i + 1].x, rightEyebrowBottomContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val leftEyeContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYE).points
-                //                    for ((i, contour) in leftEyeContours.withIndex()) {
-                //                        if (i != leftEyeContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, leftEyeContours[i + 1].x, leftEyeContours[i + 1].y, linePaint)
-                //                        else
-                //                            canvas.drawLine(contour.x, contour.y, leftEyeContours[0].x, leftEyeContours[0].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val rightEyeContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYE).points
-                //                    for ((i, contour) in rightEyeContours.withIndex()) {
-                //                        if (i != rightEyeContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, rightEyeContours[i + 1].x, rightEyeContours[i + 1].y, linePaint)
-                //                        else
-                //                            canvas.drawLine(contour.x, contour.y, rightEyeContours[0].x, rightEyeContours[0].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val upperLipTopContours = face.getContour(FirebaseVisionFaceContour.UPPER_LIP_TOP).points
-                //                    for ((i, contour) in upperLipTopContours.withIndex()) {
-                //                        if (i != upperLipTopContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, upperLipTopContours[i + 1].x, upperLipTopContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val upperLipBottomContours = face.getContour(FirebaseVisionFaceContour.UPPER_LIP_BOTTOM).points
-                //                    for ((i, contour) in upperLipBottomContours.withIndex()) {
-                //                        if (i != upperLipBottomContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, upperLipBottomContours[i + 1].x, upperLipBottomContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val lowerLipTopContours = face.getContour(FirebaseVisionFaceContour.LOWER_LIP_TOP).points
-                //                    for ((i, contour) in lowerLipTopContours.withIndex()) {
-                //                        if (i != lowerLipTopContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, lowerLipTopContours[i + 1].x, lowerLipTopContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val lowerLipBottomContours = face.getContour(FirebaseVisionFaceContour.LOWER_LIP_BOTTOM).points
-                //                    for ((i, contour) in lowerLipBottomContours.withIndex()) {
-                //                        if (i != lowerLipBottomContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, lowerLipBottomContours[i + 1].x, lowerLipBottomContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val noseBridgeContours = face.getContour(FirebaseVisionFaceContour.NOSE_BRIDGE).points
-                //                    for ((i, contour) in noseBridgeContours.withIndex()) {
-                //                        if (i != noseBridgeContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, noseBridgeContours[i + 1].x, noseBridgeContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //                    val noseBottomContours = face.getContour(FirebaseVisionFaceContour.NOSE_BOTTOM).points
-                //                    for ((i, contour) in noseBottomContours.withIndex()) {
-                //                        if (i != noseBottomContours.lastIndex)
-                //                            canvas.drawLine(contour.x, contour.y, noseBottomContours[i + 1].x, noseBottomContours[i + 1].y, linePaint)
-                //                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-                //                    }
-                //
-                //
-                //                    if (cameraFacing == Facing.FRONT) {
-                //                        val matrix = Matrix()
-                //                        matrix.preScale(-1F, 1F)
-                //                        val flippedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-                //                        face_detection_camera_image_view.setImageBitmap(flippedBitmap)
-                //                    } else {
-                //                        face_detection_camera_image_view.setImageBitmap(bitmap)
-                //                    }
-                //                }
-
-//                val bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888)
-//                val canvas = Canvas(bitmap)
-//                val dotPaint = Paint()
-//                dotPaint.color = Color.RED
-//                dotPaint.style = Paint.Style.FILL
-//                dotPaint.strokeWidth = 4F
-//                val linePaint = Paint()
-//                linePaint.color = Color.GREEN
-//                linePaint.style = Paint.Style.STROKE
-//                linePaint.strokeWidth = 2F
-//                for (face in it) {
-//
-//                    val faceContours = face.getContour(FirebaseVisionFaceContour.FACE).points
-//                    for ((i, contour) in faceContours.withIndex()) {
-//                        if (i != faceContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, faceContours[i + 1].x, faceContours[i + 1].y, linePaint)
-//                        else
-//                            canvas.drawLine(contour.x, contour.y, faceContours[0].x, faceContours[0].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val leftEyebrowTopContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYEBROW_TOP).points
-//                    for ((i, contour) in leftEyebrowTopContours.withIndex()) {
-//                        if (i != leftEyebrowTopContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, leftEyebrowTopContours[i + 1].x, leftEyebrowTopContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val leftEyebrowBottomContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYEBROW_BOTTOM).points
-//                    for ((i, contour) in leftEyebrowBottomContours.withIndex()) {
-//                        if (i != leftEyebrowBottomContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, leftEyebrowBottomContours[i + 1].x, leftEyebrowBottomContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val rightEyebrowTopContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYEBROW_TOP).points
-//                    for ((i, contour) in rightEyebrowTopContours.withIndex()) {
-//                        if (i != rightEyebrowTopContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, rightEyebrowTopContours[i + 1].x, rightEyebrowTopContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val rightEyebrowBottomContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYEBROW_BOTTOM).points
-//                    for ((i, contour) in rightEyebrowBottomContours.withIndex()) {
-//                        if (i != rightEyebrowBottomContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, rightEyebrowBottomContours[i + 1].x, rightEyebrowBottomContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val leftEyeContours = face.getContour(FirebaseVisionFaceContour.LEFT_EYE).points
-//                    for ((i, contour) in leftEyeContours.withIndex()) {
-//                        if (i != leftEyeContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, leftEyeContours[i + 1].x, leftEyeContours[i + 1].y, linePaint)
-//                        else
-//                            canvas.drawLine(contour.x, contour.y, leftEyeContours[0].x, leftEyeContours[0].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val rightEyeContours = face.getContour(FirebaseVisionFaceContour.RIGHT_EYE).points
-//                    for ((i, contour) in rightEyeContours.withIndex()) {
-//                        if (i != rightEyeContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, rightEyeContours[i + 1].x, rightEyeContours[i + 1].y, linePaint)
-//                        else
-//                            canvas.drawLine(contour.x, contour.y, rightEyeContours[0].x, rightEyeContours[0].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val upperLipTopContours = face.getContour(FirebaseVisionFaceContour.UPPER_LIP_TOP).points
-//                    for ((i, contour) in upperLipTopContours.withIndex()) {
-//                        if (i != upperLipTopContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, upperLipTopContours[i + 1].x, upperLipTopContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val upperLipBottomContours = face.getContour(FirebaseVisionFaceContour.UPPER_LIP_BOTTOM).points
-//                    for ((i, contour) in upperLipBottomContours.withIndex()) {
-//                        if (i != upperLipBottomContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, upperLipBottomContours[i + 1].x, upperLipBottomContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val lowerLipTopContours = face.getContour(FirebaseVisionFaceContour.LOWER_LIP_TOP).points
-//                    for ((i, contour) in lowerLipTopContours.withIndex()) {
-//                        if (i != lowerLipTopContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, lowerLipTopContours[i + 1].x, lowerLipTopContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val lowerLipBottomContours = face.getContour(FirebaseVisionFaceContour.LOWER_LIP_BOTTOM).points
-//                    for ((i, contour) in lowerLipBottomContours.withIndex()) {
-//                        if (i != lowerLipBottomContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, lowerLipBottomContours[i + 1].x, lowerLipBottomContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val noseBridgeContours = face.getContour(FirebaseVisionFaceContour.NOSE_BRIDGE).points
-//                    for ((i, contour) in noseBridgeContours.withIndex()) {
-//                        if (i != noseBridgeContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, noseBridgeContours[i + 1].x, noseBridgeContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//                    val noseBottomContours = face.getContour(FirebaseVisionFaceContour.NOSE_BOTTOM).points
-//                    for ((i, contour) in noseBottomContours.withIndex()) {
-//                        if (i != noseBottomContours.lastIndex)
-//                            canvas.drawLine(contour.x, contour.y, noseBottomContours[i + 1].x, noseBottomContours[i + 1].y, linePaint)
-//                        canvas.drawCircle(contour.x, contour.y, 4F, dotPaint)
-//                    }
-//
-//
-//                    if (cameraFacing == Facing.FRONT) {
-//                        val matrix = Matrix()
-//                        matrix.preScale(-1F, 1F)
-//                        val flippedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-//                        face_detection_camera_image_view.setImageBitmap(flippedBitmap)
-//                    } else {
-//                        face_detection_camera_image_view.setImageBitmap(bitmap)
-//                    }
+//                when {
+//                    it.size == 1 -> Toast.makeText(this, "Добрый день", Toast.LENGTH_SHORT).show()
+//                    it.size > 1 -> Toast.makeText(this, "Уберите чужие лица из камеры", Toast.LENGTH_SHORT).show()
 //                }
+
+                val bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                val dotPaint = Paint()
+                dotPaint.color = Color.GREEN
+                dotPaint.style = Paint.Style.FILL
+                dotPaint.strokeWidth = 4F
+                val linePaint = Paint()
+                linePaint.color = Color.WHITE
+                linePaint.style = Paint.Style.STROKE
+                linePaint.strokeWidth = 2F
+
+                for (face in it) {
+                    val one = face.getContour(FirebaseVisionFaceContour.FACE).points[0]
+                    val two = face.getContour(FirebaseVisionFaceContour.FACE).points[9]
+                    val three = face.getContour(FirebaseVisionFaceContour.FACE).points[18]
+                    val four = face.getContour(FirebaseVisionFaceContour.FACE).points[27]
+
+//                    //Верхняя
+//                    canvas.drawPoint(one.x, one.y, dotPaint)
+//                    //Левая
+//                    canvas.drawPoint(two.x, two.y, dotPaint)
+//                    //Нижняя
+//                    canvas.drawPoint(three.x, three.y, dotPaint)
+//                    //Правая
+//                    canvas.drawPoint(four.x, four.y, dotPaint)
+
+                    // внешний квадрат
+                    canvas.drawLine(940F, 140F, 290F, 140F, linePaint)
+                    canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
+                    canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
+                    canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+
+//                    //внутренний квадрат
+//                    canvas.drawLine(790F, 340F, 440F, 340F, linePaint)
+//                    canvas.drawLine(440F, 340F, 440F, 930F, linePaint)
+//                    canvas.drawLine(440F, 930F, 790F, 930F, linePaint)
+//                    canvas.drawLine(790F, 930F, 790F, 340F, linePaint)
+
+
+                    if (one.y in 140F..340F && two.x in 790F..940F && three.y in 930F..1130F && four.x in 290F..440F) {
+                        //Toast.makeText(this, "Mожете фотографировать", Toast.LENGTH_SHORT).show()
+                        hideProgress()
+                    }
+                    else {
+                        //Toast.makeText(this, "Встаньте прямо", Toast.LENGTH_SHORT).show()
+                        showProgress()
+                        linePaint.color = Color.RED
+                        canvas.drawLine(940F, 140F, 290F, 140F, linePaint)
+                        canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
+                        canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
+                        canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+                    }
+                    if (cameraFacing == Facing.FRONT) {
+                        val matrix = Matrix()
+                        matrix.preScale(-1F, 1F)
+                        val flippedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                        face_detection_camera_image_view.setImageBitmap(flippedBitmap)
+                    } else {
+                        face_detection_camera_image_view.setImageBitmap(bitmap)
+                    }
+                }
             }
             .addOnFailureListener {
                 face_detection_camera_image_view.setImageBitmap(null)
             }
     }
+
 
 //    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 //        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -444,11 +267,18 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
     private fun showProgress() {
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
+        bottomSheetButton.setOnClickListener {
+            Toast.makeText(this, "Нельзя", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun hideProgress() {
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.VISIBLE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.GONE
+        bottomSheetButton.setOnClickListener {
+            cameraView.capturePicture()
+        }
+
     }
 
 }
