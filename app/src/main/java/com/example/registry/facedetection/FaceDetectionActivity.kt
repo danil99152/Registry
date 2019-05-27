@@ -100,6 +100,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             Upload().uploadFile(fileURI)
             Toast.makeText(this, "Вы авторизовались", Toast.LENGTH_SHORT).show()
             hideProgress()
+            return
         } catch (e: FileNotFoundException) {
             Log.w("TAG", "Error saving image file: " + e.message)
         } catch (e: IOException) {
@@ -195,6 +196,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             .addOnFailureListener {
                 face_detection_camera_image_view.setImageBitmap(null)
             }
+        return
     }
 
 
@@ -217,6 +219,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
         canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
         canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+        return
     }
 
     private fun analyzeImage(image: Bitmap?) {
@@ -259,9 +262,13 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         if (faces == null || image == null) {
             Toast.makeText(this, "There was some error", Toast.LENGTH_SHORT).show()
             return
-        } else if (faces.size == 1) storeImage(image)
+        } else if (faces.size == 1) {
+            storeImage(image)
+            return
+        }
         else if (faces.size != 1) {
             hideProgress()
+            return
         }
     }
 
@@ -284,7 +291,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         bottomSheetButton.setOnClickListener {
             Toast.makeText(this, "Не видно вашего лица или несколько лиц", Toast.LENGTH_SHORT).show()
         }
-
+        return
     }
 
     private fun youCan(){
@@ -292,6 +299,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.GONE
         findViewById<View>(R.id.youCan).visibility = View.VISIBLE
         findViewById<View>(R.id.youCant).visibility = View.GONE
+        return
     }
 
     private fun youCant(){
@@ -302,6 +310,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         bottomSheetButton.setOnClickListener {
             Toast.makeText(this, "Встаньте сначала прямо", Toast.LENGTH_SHORT).show()
         }
+        return
     }
-
 }

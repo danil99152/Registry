@@ -46,5 +46,6 @@ class Upload {
                 Log.e("Upload error:", t.message)
             }
         })
+        return
     }
 }
