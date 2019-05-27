@@ -129,10 +129,10 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             .addOnSuccessListener {
                 face_detection_camera_image_view.setImageBitmap(null)
 
-//                when {
-//                    it.size == 1 -> Toast.makeText(this, "Добрый день", Toast.LENGTH_SHORT).show()
-//                    it.size > 1 -> Toast.makeText(this, "Уберите чужие лица из камеры", Toast.LENGTH_SHORT).show()
-//                }
+                when {
+                    it.size == 1 -> findViewById<View>(R.id.goodMorning).visibility = View.VISIBLE
+                    it.size != 1 -> hideProgress()
+                }
 
                 val bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.ARGB_8888)
                 val canvas = Canvas(bitmap)
@@ -169,13 +169,15 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 //                    canvas.drawLine(440F, 930F, 790F, 930F, linePaint)
 //                    canvas.drawLine(790F, 930F, 790F, 340F, linePaint)
 
-
                     if (one.y in 140F..340F && two.x in 790F..940F && three.y in 930F..1130F && four.x in 290F..440F) {
-                        //Toast.makeText(this, "Mожете фотографировать", Toast.LENGTH_SHORT).show()
-                        hideProgress()
+                        youCan()
+                        bottomSheetButton.setOnClickListener {
+                            cameraView.capturePicture()
+                            Toast.makeText(this, "Идет загрузка", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
                     }
                     else {
-                        //Toast.makeText(this, "Встаньте прямо", Toast.LENGTH_SHORT).show()
                         youCant()
                         linePaint.color = Color.RED
                         drawSquare(linePaint, canvas)
@@ -226,7 +228,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         faceDetectionModels.clear()
         bottomSheetRecyclerView.adapter?.notifyDataSetChanged()
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        showProgress()
 
         val firebaseVisionImage = FirebaseVisionImage.fromBitmap(image)
         val options = FirebaseVisionFaceDetectorOptions.Builder()
@@ -260,31 +261,44 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             return
         } else if (faces.size == 1) storeImage(image)
         else if (faces.size != 1) {
-            Toast.makeText(this, "Не видно вашего лица или несколько лиц", Toast.LENGTH_SHORT).show()
             hideProgress()
         }
     }
 
-    private fun showProgress() {
-        findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
-        findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
-        bottomSheetButton.setOnClickListener {
-            Toast.makeText(this, "Подождите, идет загрузка", Toast.LENGTH_SHORT).show()
-        }
-    }
+//    private fun showProgress() {
+//        findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
+//        findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
+//        findViewById<View>(R.id.youCan).visibility = View.GONE
+//        findViewById<View>(R.id.youCant).visibility = View.GONE
+//        bottomSheetButton.setOnClickListener {
+//            Toast.makeText(this, "Подождите, идет загрузка", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
     private fun hideProgress() {
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.VISIBLE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.GONE
+        findViewById<View>(R.id.youCan).visibility = View.GONE
+        findViewById<View>(R.id.youCant).visibility = View.GONE
+        findViewById<View>(R.id.goodMorning).visibility = View.GONE
         bottomSheetButton.setOnClickListener {
-            cameraView.capturePicture()
+            Toast.makeText(this, "Не видно вашего лица или несколько лиц", Toast.LENGTH_SHORT).show()
         }
 
+    }
+
+    private fun youCan(){
+        findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.VISIBLE
+        findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.GONE
+        findViewById<View>(R.id.youCan).visibility = View.VISIBLE
+        findViewById<View>(R.id.youCant).visibility = View.GONE
     }
 
     private fun youCant(){
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
+        findViewById<View>(R.id.youCant).visibility = View.VISIBLE
+        findViewById<View>(R.id.youCan).visibility = View.GONE
         bottomSheetButton.setOnClickListener {
             Toast.makeText(this, "Встаньте сначала прямо", Toast.LENGTH_SHORT).show()
         }
