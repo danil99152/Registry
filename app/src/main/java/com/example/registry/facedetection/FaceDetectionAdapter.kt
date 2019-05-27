@@ -23,7 +23,6 @@ class FaceDetectionAdapter(private val context: Context, private val faceDetecti
     override fun getItemCount() = faceDetectionModels.size
 
     class FaceDetectionViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
-        val view = itemView
         val text1 = itemView.findViewById<TextView>(R.id.item_face_detection_text_view1)!!
         val text2 = itemView.findViewById<TextView>(R.id.item_face_detection_text_view2)!!
     }

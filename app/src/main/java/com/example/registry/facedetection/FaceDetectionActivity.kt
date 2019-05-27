@@ -108,7 +108,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         return
     }
 
-    override fun process(frame: Frame) {
+    override fun process (frame: Frame) {
 
         val width = frame.size.width
         val height = frame.size.height
@@ -161,10 +161,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 //                    canvas.drawPoint(four.x, four.y, dotPaint)
 
                     // внешний квадрат
-                    canvas.drawLine(940F, 140F, 290F, 140F, linePaint)
-                    canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
-                    canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
-                    canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+                    drawSquare(linePaint, canvas)
 
 //                    //внутренний квадрат
 //                    canvas.drawLine(790F, 340F, 440F, 340F, linePaint)
@@ -179,12 +176,9 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
                     }
                     else {
                         //Toast.makeText(this, "Встаньте прямо", Toast.LENGTH_SHORT).show()
-                        showProgress()
+                        youCant()
                         linePaint.color = Color.RED
-                        canvas.drawLine(940F, 140F, 290F, 140F, linePaint)
-                        canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
-                        canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
-                        canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+                        drawSquare(linePaint, canvas)
                     }
                     if (cameraFacing == Facing.FRONT) {
                         val matrix = Matrix()
@@ -215,6 +209,13 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
 //            }
 //        }
 //    }
+
+    private fun drawSquare (linePaint : Paint, canvas: Canvas){
+        canvas.drawLine(940F, 140F, 290F, 140F, linePaint)
+        canvas.drawLine(290F, 140F, 290F, 1130F, linePaint)
+        canvas.drawLine(290F, 1130F, 940F, 1130F, linePaint)
+        canvas.drawLine(940F, 1130F, 940F, 140F, linePaint)
+    }
 
     private fun analyzeImage(image: Bitmap?) {
         if (image == null) {
@@ -268,7 +269,7 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
         findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
         findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
         bottomSheetButton.setOnClickListener {
-            Toast.makeText(this, "Нельзя", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Подождите, идет загрузка", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -279,6 +280,14 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
             cameraView.capturePicture()
         }
 
+    }
+
+    private fun youCant(){
+        findViewById<View>(R.id.bottom_sheet_button_image).visibility = View.GONE
+        findViewById<View>(R.id.bottom_sheet_button_progress).visibility = View.VISIBLE
+        bottomSheetButton.setOnClickListener {
+            Toast.makeText(this, "Встаньте сначала прямо", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }
