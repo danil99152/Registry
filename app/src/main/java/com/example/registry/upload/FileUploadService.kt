@@ -1,4 +1,4 @@
-package com.example.registry
+package com.example.registry.upload
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

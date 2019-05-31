@@ -1,4 +1,4 @@
-package com.example.registry
+package com.example.registry.upload
 
 import android.net.Uri
 import android.util.Log

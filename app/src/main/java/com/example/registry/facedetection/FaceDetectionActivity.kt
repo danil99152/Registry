@@ -13,7 +13,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.registry.R
-import com.example.registry.Upload
+import com.example.registry.upload.Upload
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -22,8 +22,6 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.otaliastudios.cameraview.*
-import kotlinx.android.synthetic.main.activity_face_detection.*
-import kotlinx.android.synthetic.main.bottom_sheet.*
 import kotlinx.android.synthetic.main.content_face_detection.*
 import java.io.*
 import java.text.SimpleDateFormat
@@ -46,7 +44,6 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_face_detection)
-        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         cameraView.sessionType = SessionType.PICTURE
