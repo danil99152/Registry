@@ -72,9 +72,9 @@ class FaceDetectionActivity : AppCompatActivity(), FrameProcessor {
     @SuppressLint("SimpleDateFormat")
     private fun storeImage(imageData: Bitmap) {
         // get path to external storage (SD card)
-        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_DCIM + "/FaceDetected/")
         // create storage directories, if they don't exist
-        storageDir.mkdirs()
+        storageDir?.mkdirs()
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val filename = "FaceBy$timeStamp"
         try {
